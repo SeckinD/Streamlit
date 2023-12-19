@@ -15,7 +15,7 @@ st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/BoardGameGee
 st.title("🎲:red[KUTU] :blue[OYUNU SEÇME] :red[ARACI]🎲")
 
 st.header("🪀KUTU OYUNU SEÇME ARACI🪀")
-tab_home, tab_rec, tab_ml = st.tabs(["Ana Sayfa", "Oyun Tavsiyesi", "Puan Tahmini(ML)"])
+tab_home, tab_rec, tab_ml = st.tabs(["Ana Sayfa", "Oyun Tavsiyesi", "Rating Tahmini(ML)"])
 tab_home.markdown("Kutu oyunları için bir tavsiye sistemi oluşturduk.")
 
 # st.subheader("PROJE AŞAMALARI")
@@ -99,28 +99,20 @@ tab_ml.write("# Model Prediction")
 input_df = user_input_features()
 
 # Display the user input features
-tab_ml.write("## User Input features")
-tab_ml.write(input_df)
+# tab_ml.write("## User Input features")
+# tab_ml.write(input_df)
 
 if tab_ml.button('Predict'):
     prediction = model.predict(input_df)
-    tab_ml.write("## Prediction")
+    tab_ml.write("Oyunun tahmin edilen ratingi:")
     tab_ml.write(prediction)
 
-try:
-    prediction = model.predict(input_df)
-    tab_ml.write("## Prediction")
-    tab_ml.write(prediction)
-except Exception as e:
-    tab_ml.write("An error occurred:")
-    tab_ml.write(str(e))
 
-
-tab_ml.markdown([averageweight, yearpublished, maxplaytime,minplaytime, maxplayers, minage])
-
-if tab_ml.button('Oyunumun Puanını Tahmin Et!'):
-    tab_ml.write('Oyununun Puan:')
-    tab_ml.image(df[df['Unnamed: 0'] == 232]['thumbnail'].iloc[0])
+# tab_ml.markdown([averageweight, yearpublished, maxplaytime,minplaytime, maxplayers, minage])
+#
+# if tab_ml.button('Oyunumun Puanını Tahmin Et!'):
+#     tab_ml.write('Oyununun Puan:')
+#     tab_ml.image(df[df['Unnamed: 0'] == 232]['thumbnail'].iloc[0])
 
 
 
