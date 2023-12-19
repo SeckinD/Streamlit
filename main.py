@@ -119,3 +119,4 @@ if tab_ml.button('Predict'):
 number = tab_ml.slider('Pick a number', 0, df["Unnamed: 0"].max())
 tab_ml.image(df[df['Unnamed: 0'] == number]['thumbnail'].iloc[0])
 tab_ml.write(df[df["Unnamed: 0"] == number]["primary"].iloc[0])
+tab_ml.write("CD")
