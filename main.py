@@ -67,34 +67,43 @@ tab_ml.markdown("<h1 style='text-align: center; '>Oyununuz için değerleri seç
 # sütunlara ayır
 column_one, column_two, column_three = tab_ml.columns([3, 3, 3], gap="small")
 
-
 def load_model():
-    return joblib.load("bgg_ml.joblib")
+    return joblib.load("deneme_2_lgbm_model.joblib")
 
 model = load_model()
 def user_input_features():
-    # Create user input fields here. For example:
+    # Create user input fields here.
     feature1 = yearpublished
     feature2 = minplayers
     feature3 = maxplayers
-    feature4 = minage
-    feature5 = averageweight
-    feature6 = round((minplayers / (maxplayers - minplayers+1)), 4)
-    feature7 = round((minplaytime / (maxplaytime - minplaytime+1)), 4)
-    feature8 = maxplaytime * averageweight
-    data = {'yearpublished': feature1, 'minplayers': feature2, 'maxplayers': feature3, 'minage': feature4,
-            'averageweight': feature5, 'NEW_player_ratio':feature6, 'NEW_time_ratio':feature7, 'NEW_wei_time':feature8}
-    return pd.DataFrame(data, index=[0])
+    options = ["Family_Game", "Strategy_Game", "Heavy_Game", "Party_Game", "Children's_Game"]
+    selected_options = column_one.multiselect("Select game types:", options)
 
+    # Sort options and drop the first category (alphabetically)
+    dropped_first_option = sorted(options)[0]  # 'Children's_Game' is dropped
+    options_without_first = [opt for opt in options if opt != dropped_first_option]
 
-yearpublished = column_two.slider('Choose Year Published', 1900, df["yearpublished"].max())
-averageweight = column_one.slider('Choose Weight', 1.0, 5.0)
-minage = column_three.slider('Choose Min Age', df["minage"].min(), df["minage"].max())
-maxplaytime = column_three.slider('Choose Max Playtime', df["maxplaytime"].min(), 600)
-minplaytime = column_two.slider('Choose Min Playtime', df["minplaytime"].min(), 600)
-maxplayers = column_one.slider('Choose Max Number of Players', df["maxplayers"].min(), 20)
-minplayers = column_one.slider('Choose Min Number of Players', df["minplayers"].min(), 20)
+    # Initialize the DataFrame for NEW_CAT with zeros for the remaining categories
+    new_cat_df = pd.DataFrame(columns=options_without_first)
+    new_cat_df.loc[0] = [0] * len(options_without_first)
 
+    # Mark selected options as 1, except for the first one
+    for option in selected_options:
+        if option in new_cat_df.columns:
+            new_cat_df.at[0, option] = 1
+
+    # Assembling the data
+    data = {'yearpublished': feature1, 'minplayers': feature2, 'maxplayers': feature3}
+    features_df = pd.DataFrame(data, index=[0])
+
+    return pd.concat([features_df, new_cat_df], axis=1)
+
+# Slider inputs (example values, adjust according to your data)
+yearpublished = column_two.slider('Choose Year Published', 1900, 2023)
+maxplayers = column_one.slider('Choose Max Number of Players', 1, 10)
+minplayers = column_one.slider('Choose Min Number of Players', 1, 10)
+
+tab_ml = st.container()
 tab_ml.write("# Model Prediction")
 input_df = user_input_features()
 
@@ -106,15 +115,6 @@ if tab_ml.button('Predict'):
     prediction = model.predict(input_df)
     tab_ml.write("Oyunun tahmin edilen ratingi:")
     tab_ml.write(prediction)
-
-
-# tab_ml.markdown([averageweight, yearpublished, maxplaytime,minplaytime, maxplayers, minage])
-#
-# if tab_ml.button('Oyunumun Puanını Tahmin Et!'):
-#     tab_ml.write('Oyununun Puan:')
-#     tab_ml.image(df[df['Unnamed: 0'] == 232]['thumbnail'].iloc[0])
-
-
 
 number = tab_ml.slider('Pick a number', 0, df["Unnamed: 0"].max())
 tab_ml.image(df[df['Unnamed: 0'] == number]['thumbnail'].iloc[0])
